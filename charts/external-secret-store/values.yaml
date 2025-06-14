@@ -1,0 +1,66 @@
+external-secrets:
+  serviceAccount:
+    create: true
+    annotations:
+      iam.gke.io/gcp-service-account: external-secrets@dataloop-infra.iam.gserviceaccount.com
+
+  webhook:
+    create: true
+
+  certController:
+    create: true
+
+  securityContext:
+    fsGroup: 65534
+    runAsUser: 65534
+    runAsNonRoot: true
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+  # Configure GCP Secret Manager as the default provider
+  secretStore:
+    defaultStore: gcp-store
+
+  # GCP Secret Manager configuration
+  gcp:
+    enabled: true
+    projectID: dataloop-infra
+    auth:
+      secretRef:
+        name: gcp-secret-store-creds
+        key: credentials.json
+
+  # Additional configurations
+  installCRDs: true
+  replicaCount: 1
+  
+  # Pod security context
+  podSecurityContext:
+    fsGroup: 65534
+    runAsUser: 65534
+    runAsNonRoot: true
+
+  # Node selector and tolerations
+  nodeSelector: {}
+  tolerations: []
+
+  # Pod annotations
+  podAnnotations: {}
+
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 8080
+
+  # Metrics configuration
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      interval: 30s
